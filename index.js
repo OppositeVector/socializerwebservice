@@ -17,11 +17,11 @@ function FindByName(name, array) {
 }
 
 function SendJson(json,res){
-	res.header("Access-Control-Allow-Origin","*");
-	res.header("Access-Control-Allow-Headers","Origin, X-Requested-With, Content-Type, Accept");
-	service.set("json spaces",4);
-	res.set("Content-Type","application/json");
-	res.status(200);
+	// res.header("Access-Control-Allow-Origin","*");
+	// res.header("Access-Control-Allow-Headers","Origin, X-Requested-With, Content-Type, Accept");
+	// service.set("json spaces",4);
+	// res.set("Content-Type","application/json");
+	// res.status(200);
 	res.json(json);
 }
 
