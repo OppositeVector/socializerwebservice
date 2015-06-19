@@ -150,9 +150,11 @@ service.get('/register',function (req,res) {
 	var query = urlPart.query;
 	if((query.key != null) && (query.pn != null)) {
 		ProcessRegister(query.key, query.pn, res);
-	} else {
-		SendJson({result: 0, data:"Missing parameters"}, res);
+		return;
 	}
+
+	console.log("Missing parameters on login");
+	SendJson({result: 0, data:"Missing parameters"}, res);
 
 });
 
@@ -160,9 +162,12 @@ service.post('/register',function (req,res) {
 
 	if((req.body.key != null) && (req.body.pn)) {
 		ProcessRegister(req.body.key, req.body.pn, res);
-	} else {
-		SendJson({result: 0, data:"Missing parameters"}, res);
+		return;
 	}
+
+	console.log("Missing parameters on login");
+	SendJson({result: 0, data:"Missing parameters"}, res);
+
 
 });
 
@@ -172,9 +177,11 @@ service.get('/login',function (req,res) {
 	var query = urlPart.query;
 	if((query.key != null) && (query.pn != null)) {
 		ProcessLogin(query.key, query.pn, res);
-	} else {
-		SendJson({result: 0, data:"Missing parameters"}, res);
+		return;
 	}
+
+	console.log("Missing parameters on register");
+	SendJson({result: 0, data:"Missing parameters"}, res);
 
 });
 
@@ -182,9 +189,11 @@ service.post('/login',function (req,res) {
 
 	if((req.body.key != null) && (req.body.pn != null)) {
 		ProcessLogin(req.body.key, req.body.pn, res);
-	} else {
-		SendJson({result: 0, data:"Missing parameters"},res );
+		return;
 	}
+
+	console.log("Missing parameters on register");
+	SendJson({result: 0, data:"Missing parameters"}, res);
 	
 });
 
@@ -197,6 +206,7 @@ service.get("/createGroup", function (req, res) {
 		}
 	}
 
+	console.log("Missing parameters on createGroup");
 	SendJson({result: 0, data:"Missing parameters"}, res);
 
 });
@@ -210,6 +220,7 @@ service.post("/createGroup", function (req,res) {
 		}
 	}
 
+	console.log("Missing parameters on createGroup");
 	SendJson({result: 0, data:"Missing parameters"}, res);
 	
 });
