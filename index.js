@@ -188,6 +188,19 @@ service.post('/login',function (req,res) {
 	
 });
 
+service.get("/createGroup", function (req, res) {
+
+	if(req.body != null) {
+		if((req.body.key != null) && (req.body.pn != null) && (req.body.group != null)) {
+			ProcessCreateGroup(req.body.key, req.body.pn, req.body.group, res);
+			return;
+		}
+	}
+
+	SendJson({result: 0, data:"Missing parameters"}, res);
+
+});
+
 service.post("/createGroup", function (req,res) {
 	
 	if(req.body != null) {
