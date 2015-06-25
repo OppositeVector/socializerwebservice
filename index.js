@@ -17,11 +17,11 @@ function FindByName(name, array) {
 }
 
 function SendJson(json,res){
-	// res.header("Access-Control-Allow-Origin","*");
-	// res.header("Access-Control-Allow-Headers","Origin, X-Requested-With, Content-Type, Accept");
-	// service.set("json spaces",4);
-	// res.set("Content-Type","application/json");
-	// res.status(200);
+	res.header("Access-Control-Allow-Origin","*");
+	res.header("Access-Control-Allow-Headers","Origin, X-Requested-With, Content-Type, Accept");
+	service.set("json spaces",4);
+	res.set("Content-Type","application/json");
+	res.status(200);
 	res.json(json);
 }
 
@@ -142,8 +142,6 @@ function ProcessUpdateGroup(key, number, group, res) {
 
 }
 
-service.use("/", express.static("./../app"));
-
 service.get('/register',function (req,res) {
 
 	var urlPart = url.parse(req.url,true);
@@ -240,73 +238,6 @@ service.post("/updateGroup", function (req, res) {
 		SendJson({result: 0, data:"Missing parameters"}, res);
 	}
 });
-
-// service.get('/removeGroup',function (req,res){
-
-// 	var urlPart = url.parse(req.url,true);
-// 	var query = urlPart.query;
-// 	if((query.pn!=null)&&(query.n!=null)){
-// 		dbController.GetUser(query.pn,function(userData){
-// 			if(userData.key==query.key){
-// 				dbController.RemoveGroup(query.pn,query.n);
-// 				SendJson({
-// 					result:1,
-// 					data:"group "+query.n+" successfuly removed"
-// 				},res);
-// 			}else{
-// 				SendJson({
-// 					result:0,
-// 					data:"invalid key"
-// 				},res);
-// 				console.log("key authentication failure");
-// 			}
-// 		});
-// 	}else{
-// 		SendJson({
-// 					result:0,
-// 					data:"missing prarameters"
-// 				},res);
-// 	}
-
-
-// });
-
-/*
-service.get('/addContact',function (req,res){
-
-	var urlPart = url.parse(req.url,true);
-	var query = urlPart.query;
-	if((query.pn!=null)&&(query.n!=null)){
-		dbController.GetUser(query.pn,function(userData){
-			if(userData.key==query.key){
-				var contactDetails = {contactName:query.cn,
-									contactPhoneN
-									whatsapp:query.fw};
-				dbController.RemoveGroup(query.pn,{name:query.n,frequency:frequency});
-				SendJson({
-					result:1,
-					data:"group "+query.n+" successfuly removed"
-				},res);
-			}else{
-				SendJson({
-					result:0,
-					data:"invalid key"
-				},res);
-				console.log("key authentication failure");
-			}
-		});
-	}else{
-		SendJson({
-					result:0,
-					data:"missing prarameters"
-				},res);
-	}
-
-
-});*/
-
-
-
 
 service.listen(port, function() {
     console.log('App ready on port: ' + port);
