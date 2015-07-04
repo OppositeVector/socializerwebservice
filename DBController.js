@@ -4,11 +4,13 @@ var group = require('./schemas/groupSchema');
 var contact = require('./schemas/contactSchema');
 
 var uri = "mongodb://ds039281.mongolab.com:39281/heroku_app37608389";
+var dbUser = process.env.DB_USER || "WebServiceUser";
+var dbPass = process.env.DB_PASSWORD || "ifyouwannashotshotdontt4lk";
 var options = {
 	server: { },
 	replset: { },
-	user: "WebServiceUser",
-	pass: "ifyouwannashotshotdontt4lk"
+	user: dbUser,
+	pass: dbPass
 }
 options.server.socketOptions = options.replset.socketOptions = { keepAlive: 1 };
 
@@ -25,7 +27,7 @@ con.once('open',function(err){
 	if(err!=null){
 		console.log(err);
 	}else{
-		console.log('Successfully opened db connection');
+		console.log('Successfully opened db connection, user: ' + dbUser + ", pass: " + dbPass);
 	}
 
 });

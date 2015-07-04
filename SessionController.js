@@ -18,7 +18,8 @@ function controller(express, mongoose) {
 	app = express;
 	dbController = mongoose;
 
-	var s = process.env.SESSION_SECRET || 'For production';
+	var prod = 'For production'
+	var s = process.env.SESSION_SECRET || prod;
 
 	app.use(session({
 		secret: s,
@@ -75,6 +76,6 @@ function controller(express, mongoose) {
 
 	});
 
-	console.log("Session store ready with secret " + s);
+	console.log("Session store ready with secret \"" + ((s == prod) ? (s) : ("I wont tell you !")) + "\"");
 
 }
