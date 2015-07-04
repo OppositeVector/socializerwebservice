@@ -9,7 +9,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "connect-mongo": "^0.8.1",
     "express": "^4.12.4",
+    "express-session": "^1.11.3",
     "mongoose": "^4.0.5"
   }
 }

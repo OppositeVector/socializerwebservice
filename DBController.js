@@ -14,13 +14,13 @@ options.server.socketOptions = options.replset.socketOptions = { keepAlive: 1 };
 
 mongoose.connect(uri, options);
 
-var con = mongoose.connection;
+var con = module.exports.connection = mongoose.connection;
 
 var userModel = mongoose.model('userM',user.userSchema);
 // var groupModel = mongoose.model('groupM',group.groupSchema);
 // var contactModel = mongoose.model('contactM',contact.contactSchema);
 
-mongoose.connection.once('open',function(err){
+con.once('open',function(err){
 
 	if(err!=null){
 		console.log(err);
@@ -404,6 +404,8 @@ exports.ChangeContact = function(username, groupname, contact, callback) {
 	});
 
 }
+
+
 
 // Helper functions
 // attach the .equals method to Array's prototype to call it on any array

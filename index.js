@@ -1,242 +1,129 @@
 var express = require('express');
 var url = require('url');
-var dbController = require('./DBController');
+var dbController = require("./DBController");
 var service = express();
+var actions = require("./Actions")(service, dbController);
+
 var port = process.env.PORT || 3000;
-
-/*
-	Response format { result: 0 / 1, data: { Data block requested }}
-*/
-
-function FindByName(name, array) {
-	for(var i = 0; i < array.length; ++i) {
-		if(name == array[i].name) {
-			return i;
-		}
-	}
-}
-
-function SendJson(json,res){
-	res.header("Access-Control-Allow-Origin","*");
-	res.header("Access-Control-Allow-Headers","Origin, X-Requested-With, Content-Type, Accept");
-	service.set("json spaces",4);
-	res.set("Content-Type","application/json");
-	res.status(200);
-	res.json(json);
-}
-
-function ProcessRegister(key, number, res) {
-
-	dbController.AddUser({phoneNumber: number, key: key},function(userData){
-		if(userData.err!=null){
-			console.log("Error registering: " + userData.err.msg);
-			SendJson({result: 0, data: userData }, res);
-		}else{
-			SendJson({result: 1, data: "Registration successful"},res);
-			console.log("register success:"+ userData.phoneNumber);	
-		}
-	});
-
-}
-
-function ProcessLogin(key, number, res) {
-
-	dbController.GetUser(number,function(userData){
-		if(userData.err != null) {
-			SendJson({result: 0, data: userData}, res);
-		} else {
-			if(userData.key==key){
-				SendJson({ result:1, data:userData },res);
-			}else{
-				SendJson({ result:0, data:"Login failed" },res);
-				console.log("authentication failure");
-			}
-			console.log("Done with login");
-		}
-	});
-
-}
-
-function ProcessCreateGroup(key, number, group, res) {
-
-	dbController.GetUser(number, function(user) {
-		if(user.err != null) {
-			SendJson({result:0, data: user}, res);
-		} else {
-			if(user.key == key) {
-				var gIndex = FindByName(group.name, user.groups);
-				if(gIndex != null) {
-					SendJson({result:0, data: "Group already exists"}, res);
-				} else {
-					user.group.push(group);
-					dbController.UpdateUser(user, function(u) {
-						if(u.err != null) {
-							SendJson({resut:0, data: u},res);
-						} else {
-							SendJson({result:1, data: "Group added"}, res);
-						}
-					});
-				}
-			} else {
-				SendJson({result:0, data: "Authentication failed"}, res);
-			}
-		}
-	});
-
-}
-
-function ProccessRemoveGroup(key, number, groupName, res) {
-
-	dbController.GetUser(number, function(user) {
-		if(user.err != null) {
-			SendJson({result:0, data: user}, res);
-		} else {
-			if(user.key = key) {
-				var gIndex = FindByName(groupName, user.groups);
-				if(gIndex != null) {
-					user.groups.splice(gIndex, 1);
-					dbController.UpdateUser(user, function(u) {
-						if(u.err != null) {
-							SendJson({result:0, data: u}, res);
-						} else {
-							SendJson({Result:1, data: "Group removed"}, res);
-						}
-					});
-				} else {
-					SendJson({result:0, data: "Group not found"}, res);
-				}
-			} else {
-				SendJson({result: 0, data: "Authentication failed"}, res);
-			}
-		}
-	});
-
-}
-
-function ProcessUpdateGroup(key, number, group, res) {
-
-	dbController.GetUser(number, function(user) {
-		if(user.err == null) {
-			if(user.key == key) {
-				var gIndex = FindByName(group.name, user.groups);
-				if(gindex != null) {
-					user.groups[gIndex] = group;
-					dbController.UpdateUser(user, function(u) {
-						if(u.err != null) {
-							SendJson({result: 1, data: "Group updated"}, res);
-						} else {
-							SendJson({result:0, data: u}, res);
-						}
-					});
-				} else {
-					SendJson({result:0, data: "Group not found"}, res);
-				}
-			} else {
-				SendJson({result:0, data: "Authentication failed"}, res);
-			}
-			
-		} else {
-			SendJson({result:0, data: user}, res);
-		}
-	});
-
-}
 
 service.get('/register',function (req,res) {
 
 	var urlPart = url.parse(req.url,true);
 	var query = urlPart.query;
 	if((query.key != null) && (query.pn != null)) {
-		ProcessRegister(query.key, query.pn, res);
+		actions.Register(query.key, query.pn, res);
 		return;
 	}
 
 	console.log("Missing parameters on login");
-	SendJson({result: 0, data:"Missing parameters"}, res);
+	actions.SendJson({result: 0, data:"Missing parameters"}, res);
 
 });
 
 service.post('/register',function (req,res) {
 
 	if((req.body.key != null) && (req.body.pn)) {
-		ProcessRegister(req.body.key, req.body.pn, res);
+		actions.Register(req.body.key, req.body.pn, res);
 		return;
 	}
 
 	console.log("Missing parameters on login");
-	SendJson({result: 0, data:"Missing parameters"}, res);
+	actions.SendJson({result: 0, data:"Missing parameters"}, res);
 
 
 });
 
+// Located here because i want the registration paths to come before the session check, skipping it
+var sessionController = require("./SessionController")(service, dbController);
+
 service.get('/login',function (req,res) {
 
-	var urlPart = url.parse(req.url,true);
-	var query = urlPart.query;
-	if((query.key != null) && (query.pn != null)) {
-		ProcessLogin(query.key, query.pn, res);
-		return;
+	if(req.session.user != null) {
+		actions.SendJson({result: 1, data:"Session created"}, res);
+		console.log("Session created for user " + req.session.user.phoneNumber);
+	} else {
+		actions.SendJson({result: 0, data:"Session authentication failed"}, res);
+		console.log("Session authentication failed for user " + req.session.user.phoneNumber);
 	}
-
-	console.log("Missing parameters on register");
-	SendJson({result: 0, data:"Missing parameters"}, res);
 
 });
 
 service.post('/login',function (req,res) {
 
-	if((req.body.key != null) && (req.body.pn != null)) {
-		ProcessLogin(req.body.key, req.body.pn, res);
-		return;
+	if(req.session.user != null) {
+		actions.SendJson({result: 1, data:"Session created"}, res);
+		console.log("Session created for user " + req.session.user.phoneNumber);
+	} else {
+		actions.SendJson({result: 0, data:"Session authentication failed"}, res);
+		console.log("Session authentication failed for user " + req.session.user.phoneNumber);
 	}
-
-	console.log("Missing parameters on register");
-	SendJson({result: 0, data:"Missing parameters"}, res);
 	
 });
 
 service.get("/createGroup", function (req, res) {
 
-	if(req.body != null) {
-		if((req.body.key != null) && (req.body.pn != null) && (req.body.group != null)) {
-			ProcessCreateGroup(req.body.key, req.body.pn, req.body.group, res);
+	var urlPart = url.parse(req.url,true);
+	var query = urlPart.query;
+
+	if(query != null) {
+		if(query.group != null) {
+			actions.CreateGroup(req.session.user, query.group, res);
 			return;
 		}
 	}
 
 	console.log("Missing parameters on createGroup");
-	SendJson({result: 0, data:"Missing parameters"}, res);
+	actions.SendJson({result: 0, data:"Missing parameters on /createGroup"}, res);
 
 });
 
 service.post("/createGroup", function (req,res) {
 	
 	if(req.body != null) {
-		if((req.body.key != null) && (req.body.pn != null) && (req.body.group != null)) {
-			ProcessCreateGroup(req.body.key, req.body.pn, req.body.group, res);
+		if(req.body.group != null) {
+			actions.CreateGroup(req.session.user, req.body.group, res);
 			return;
 		}
 	}
 
 	console.log("Missing parameters on createGroup");
-	SendJson({result: 0, data:"Missing parameters"}, res);
+	actions.SendJson({result: 0, data:"Missing parameters on /createGroup"}, res);
 	
 });
 
 service.post("/removeGroup", function (req, res) {
-	if((req.body.key != null) && (req.body.pn != null) && (req.body.groupName != null)) {
-		ProccessRemoveGroup(req.body.key, req.body.pn, req.body.groupName, res);
-	} else {
-		SendJson({result: 0, data:"Missing parameters"}, res);
+
+	if(req.body != null) {
+		if(req.body.groupName != null) {
+			actions.RemoveGroup(req.session.user, req.body.groupName, res);
+			return;
+		}
 	}
+
+	console.log("Missing parameters on removeGroup");
+	actions.SendJson({result: 0, data:"Missing parameters on /removeGroup"}, res);
+	
 });
 
 service.post("/updateGroup", function (req, res) {
-	if((req.body.key != null) && (req.body.pn != null) && (req.body.group != null)) {
-		ProcessUpdateGroup(req.body.key, req.body.pn, req.body.group, res);
-	} else {
-		SendJson({result: 0, data:"Missing parameters"}, res);
+
+	if(req.body != null) {
+		if(req.body.group != null) {
+			actions.UpdateGroup(req.session.user, req.body.group, res);
+			return;
+		}
 	}
+
+	console.log("Missing parameters on updateGroup");
+	actions.SendJson({result: 0, data:"Missing parameters on /updateGroup"}, res);
+	
+});
+
+service.get("/tester", function(req, res) {
+
+	actions.SendJson({timesViewed: req.session.counter}, res);
+	console.log(req.session.counter);
+
 });
 
 service.listen(port, function() {
