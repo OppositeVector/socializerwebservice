@@ -34,7 +34,7 @@ service.post('/register',function (req,res) {
 });
 
 // Located here because i want the registration paths to come before the session check, skipping it
-var sessionController = require("./SessionController")(service, dbController);
+var sessionController = require("./SessionController")(service, dbController, actions);
 
 service.get('/login',function (req,res) {
 

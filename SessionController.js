@@ -12,11 +12,13 @@ if(!String.prototype.startsWith){
 
 var app;
 var dbController;
+var actions;
 
-function controller(express, mongoose) {
+function controller(express, mongoose, act) {
 
 	app = express;
 	dbController = mongoose;
+	actions = act;
 
 	var prod = 'For production'
 	var s = process.env.SESSION_SECRET || prod;
@@ -54,20 +56,20 @@ function controller(express, mongoose) {
 			if((number != null) && (key != null)) {
 				dbController.GetUser(number,function(userData){
 					if(userData.err != null) {
-						SendJson({result: 0, data: userData}, res);
+						actions.SendJson({result: 0, data: userData}, res);
 					} else {
 						if(userData.key==key){
 							req.session.user = userData;
 							console.log("Session created");
 							next();
 						}else{
-							SendJson({ result:0, data:"Session creation failed" },res);
+							actions.SendJson({ result:0, data:"Session creation failed" },res);
 							console.log("Authentication failure");
 						}
 					}
 				});
 			} else{
-				SendJson({result: 0, data:"Missing parameters for session creation"}, res);
+				actions.SendJson({result: 0, data:"Missing parameters for session creation"}, res);
 			}
 
 		} else {
