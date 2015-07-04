@@ -18,7 +18,7 @@ function controller(express, mongoose) {
 	app = express;
 	dbController = mongoose;
 
-	var s = process.env.SESSION_SECRECT || 'For production';
+	var s = process.env.SESSION_SECRET || 'For production';
 
 	app.use(session({
 		secret: s,
