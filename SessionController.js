@@ -1,5 +1,6 @@
 var session = require("express-session");
 var mongoStore = require('connect-mongo')(session);
+var url = require('url');
 
 exports = module.exports = controller;
 
