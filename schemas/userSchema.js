@@ -32,8 +32,6 @@ var user = new schemaBase({
 		},
 		lastReset:Date
 	}]
-},{collection:'users'});
-
-
+},{collection: "users"});
 
 exports.userSchema = user;

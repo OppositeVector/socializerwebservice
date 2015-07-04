@@ -1,14 +1,9 @@
 var session = require("express-session");
 var mongoStore = require('connect-mongo')(session);
 var url = require('url');
+var errors = require("./Errors");
 
 exports = module.exports = controller;
-
-if(!String.prototype.startsWith){
-    String.prototype.startsWith = function (str) {
-        return !this.indexOf(str);
-    }
-}
 
 var app;
 var dbController;
@@ -20,8 +15,8 @@ function controller(express, mongoose, act) {
 	dbController = mongoose;
 	actions = act;
 
-	var prod = 'For production'
-	var s = process.env.SESSION_SECRET || prod;
+	var dev = 'For development'
+	var s = process.env.SESSION_SECRET || dev;
 
 	app.use(session({
 		secret: s,
@@ -55,21 +50,19 @@ function controller(express, mongoose, act) {
 
 			if((number != null) && (key != null)) {
 				dbController.GetUser(number,function(userData){
-					if(userData.err != null) {
-						actions.SendJson({result: 0, data: userData}, res);
+					if(userData.result != null) {
+						actions.SendJson(userData, res);
 					} else {
 						if(userData.key==key){
 							req.session.user = userData;
-							console.log("Session created");
 							next();
 						}else{
-							actions.SendJson({ result:0, data:"Session creation failed" },res);
-							console.log("Authentication failure");
+							actions.SendJson(errors.sessionFailed(req.session.user.phoneNumber), res);
 						}
 					}
 				});
 			} else{
-				actions.SendJson({result: 0, data:"Missing parameters for session creation"}, res);
+				actions.SendJson(errors.missingParameter("session creation"), res);
 			}
 
 		} else {
@@ -78,6 +71,6 @@ function controller(express, mongoose, act) {
 
 	});
 
-	console.log("Session store ready with secret \"" + ((s == prod) ? (s) : ("I wont tell you !")) + "\"");
+	console.log("Session store ready with secret \"" + ((s == dev) ? (s) : ("I wont tell you !")) + "\"");
 
 }

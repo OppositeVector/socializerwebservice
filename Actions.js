@@ -1,6 +1,7 @@
-/*
-	Response format { result: 0 / 1, data: { Data block requested }}
-*/
+var errors = require("./Errors");
+
+var app;
+var dbController;
 
 function FindByName(name, array) {
 	for(var i = 0; i < array.length; ++i) {
@@ -12,12 +13,12 @@ function FindByName(name, array) {
 
 module.exports = function(express, mongoose) {
 
-	var app = express;
-	var dbConotrller = mongoose;
+	app = express;
+	dbController = mongoose;
 
 	function Actions() {
 
-		this.SendJson = function(json,res){
+		function SendJson(json, res) {
 			res.header("Access-Control-Allow-Origin","*");
 			res.header("Access-Control-Allow-Headers","Origin, X-Requested-With, Content-Type, Accept");
 			app.set("json spaces",4);
@@ -26,15 +27,16 @@ module.exports = function(express, mongoose) {
 			res.json(json);
 		}
 
+		this.SendJson = SendJson;
+
 		this.Register = function(key, number, res) {
 
 			dbController.AddUser({phoneNumber: number, key: key},function(userData){
-				if(userData.err!=null){
-					console.log("Error registering: " + userData.err.msg);
-					SendJson({result: 0, data: userData }, res);
-				}else{
+				if(userData.result == null){
 					SendJson({result: 1, data: "Registration successful"},res);
 					console.log("register success:"+ userData.phoneNumber);	
+				}else{
+					SendJson(userData, res);
 				}
 			});
 
@@ -44,14 +46,14 @@ module.exports = function(express, mongoose) {
 
 			var gIndex = FindByName(group.name, user.groups);
 			if(gIndex != null) {
-				SendJson({result:0, data: "Group already exists"}, res);
+				SendJson(errors.groupExists(), res);
 			} else {
 				user.group.push(group);
-				dbController.UpdateUser(user, function(u) {
-					if(u.err != null) {
-						SendJson({resut:0, data: u},res);
-					} else {
+				dbController.UpdateUser(user, function(userData) {
+					if(userData.result == null) {
 						SendJson({result:1, data: "Group added"}, res);
+					} else {
+						SendJson(userData, res);
 					}
 				});
 			}
@@ -63,45 +65,45 @@ module.exports = function(express, mongoose) {
 			var gIndex = FindByName(groupName, user.groups);
 			if(gIndex != null) {
 				user.groups.splice(gIndex, 1);
-				dbController.UpdateUser(user, function(u) {
-					if(u.err != null) {
-						SendJson({result:0, data: u}, res);
+				dbController.UpdateUser(user, function(userData) {
+					if(userData.result == null) {
+						SendJson({result:1, data: "Group removed"}, res);
 					} else {
-						SendJson({Result:1, data: "Group removed"}, res);
+						SendJson(userData, res);
 					}
 				});
 			} else {
-				SendJson({result:0, data: "Group not found"}, res);
+				SendJson(errors.groupNotFound(), res);
 			}
 
 		}
 
 		this.UpdateGroup = function(user, group, res) {
 
-			dbController.GetUser(number, function(user) {
-				if(user.err == null) {
-					if(user.key == key) {
-						var gIndex = FindByName(group.name, user.groups);
-						if(gindex != null) {
-							user.groups[gIndex] = group;
-							dbController.UpdateUser(user, function(u) {
-								if(u.err != null) {
-									SendJson({result: 1, data: "Group updated"}, res);
-								} else {
-									SendJson({result:0, data: u}, res);
-								}
-							});
-						} else {
-							SendJson({result:0, data: "Group not found"}, res);
-						}
+			var gIndex = FindByName(group.name, user.groups);
+			if(gindex != null) {
+				user.groups[gIndex] = group;
+				dbController.UpdateUser(user, function(userData) {
+					if(userData.result == null) {
+						SendJson({result: 1, data: "Group updated"}, res);
 					} else {
-						SendJson({result:0, data: "Authentication failed"}, res);
+						SendJson(userData, res);
 					}
-					
-				} else {
-					SendJson({result:0, data: user}, res);
-				}
-			});
+				});
+			} else {
+				SendJson(errors.groupNotFound(), res);
+			}
+
+		}
+
+		this.RetrieveGroup = function(user, groupName, res) {
+
+			var gIndex = FindByName(groupName, user.groups);
+			if(gIndex == null) {
+				SendJson({result:1, data: user.groups[gIndex]}, res);
+			} else {
+				SendJson(errors.groupNotFound(), res);
+			}
 
 		}
 

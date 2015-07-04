@@ -3,6 +3,7 @@ var url = require('url');
 var dbController = require("./DBController");
 var service = express();
 var actions = require("./Actions")(service, dbController);
+var errors = require("./Errors");
 
 var port = process.env.PORT || 3000;
 
@@ -15,8 +16,7 @@ service.get('/register',function (req,res) {
 		return;
 	}
 
-	console.log("Missing parameters on login");
-	actions.SendJson({result: 0, data:"Missing parameters"}, res);
+	actions.SendJson(errors.missingParameter("register"), res);
 
 });
 
@@ -27,8 +27,7 @@ service.post('/register',function (req,res) {
 		return;
 	}
 
-	console.log("Missing parameters on login");
-	actions.SendJson({result: 0, data:"Missing parameters"}, res);
+	actions.SendJson(errors.missingParameter("register"), res);
 
 
 });
@@ -41,9 +40,6 @@ service.get('/login',function (req,res) {
 	if(req.session.user != null) {
 		actions.SendJson({result: 1, data:"Session created"}, res);
 		console.log("Session created for user " + req.session.user.phoneNumber);
-	} else {
-		actions.SendJson({result: 0, data:"Session authentication failed"}, res);
-		console.log("Session authentication failed for user " + req.session.user.phoneNumber);
 	}
 
 });
@@ -53,9 +49,6 @@ service.post('/login',function (req,res) {
 	if(req.session.user != null) {
 		actions.SendJson({result: 1, data:"Session created"}, res);
 		console.log("Session created for user " + req.session.user.phoneNumber);
-	} else {
-		actions.SendJson({result: 0, data:"Session authentication failed"}, res);
-		console.log("Session authentication failed for user " + req.session.user.phoneNumber);
 	}
 	
 });
@@ -72,8 +65,7 @@ service.get("/createGroup", function (req, res) {
 		}
 	}
 
-	console.log("Missing parameters on createGroup");
-	actions.SendJson({result: 0, data:"Missing parameters on /createGroup"}, res);
+	actions.SendJson(errors.missingParameter("createGroup"), res);
 
 });
 
@@ -86,8 +78,7 @@ service.post("/createGroup", function (req,res) {
 		}
 	}
 
-	console.log("Missing parameters on createGroup");
-	actions.SendJson({result: 0, data:"Missing parameters on /createGroup"}, res);
+	actions.SendJson(errors.missingParameter("createGroup"), res);
 	
 });
 
@@ -100,8 +91,7 @@ service.post("/removeGroup", function (req, res) {
 		}
 	}
 
-	console.log("Missing parameters on removeGroup");
-	actions.SendJson({result: 0, data:"Missing parameters on /removeGroup"}, res);
+	actions.SendJson(errors.missingParameter("removeGroup"), res);
 	
 });
 
@@ -114,9 +104,26 @@ service.post("/updateGroup", function (req, res) {
 		}
 	}
 
-	console.log("Missing parameters on updateGroup");
-	actions.SendJson({result: 0, data:"Missing parameters on /updateGroup"}, res);
+	actions.SendJson(errors.missingParameter("updateGroup"), res);
 	
+});
+
+service.get("/retriveAll", function (req, res) {
+	var retVal = req.session.user.groups;
+	actions.SendJson(retVal, res);
+});
+
+service.get("/retrieveGroup", function (req, res) {
+
+	if(req.body != null) {
+		if(req.body.groupName != null) {
+			actions.RetrieveGroup(req.session.user, req.body.groupName, res);
+			return;
+		}
+	}
+
+	actions.SendJson(errors.missingParameter("retrieveGroup"), res);
+
 });
 
 service.get("/tester", function(req, res) {
