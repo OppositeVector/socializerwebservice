@@ -8,7 +8,7 @@ var bodyParser = require("body-parser");
 
 var port = process.env.PORT || 3000;
 
-app.use(bodyParser);
+app.use(bodyParser.json());
 
 function NonSessioned() {
 
