@@ -29,7 +29,7 @@ module.exports = function(express, mongoose) {
 
 		this.SendJson = SendJson;
 
-		this.Register = function(key, number, res) {
+		this.Register = function(number, key, res) {
 
 			dbController.AddUser({phoneNumber: number, key: key},function(userData){
 				if(userData.result == null){
@@ -37,6 +37,23 @@ module.exports = function(express, mongoose) {
 					console.log("register success:"+ userData.phoneNumber);	
 				}else{
 					SendJson(userData, res);
+				}
+			});
+
+		}
+
+		this.Login = function(number, key, req, res) {
+
+			dbController.GetUser(number,function(userData){
+				if(userData.result != null) {
+					SendJson(userData, res);
+				} else {
+					if(userData.key==key){
+						req.session.user = userData;
+						SendJson({result: 1, data: "Authentication successfull"}, res);
+					}else{
+						SendJson(errors.sessionFailed(req.session.user.phoneNumber), res);
+					}
 				}
 			});
 

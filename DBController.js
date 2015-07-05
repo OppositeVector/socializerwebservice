@@ -1,21 +1,23 @@
 var mongoose = require('mongoose');
 var user = require('./schemas/userSchema');
 
-var uri = process.env.MONGOLAB_URI || "mongodb://WebDevUser:webdevuser@ds061188.mongolab.com:61188/socializerdev";
-var dbUser = process.env.DB_USER || "WebDevUser";
-var dbPass = process.env.DB_PASSWORD || "webdevuser";
+var dotenv = require("dotenv")
+dotenv.config({silent: true})
+dotenv.load();
+
 var options = {
 	server: { },
 	replset: { },
-	user: dbUser,
-	pass: dbPass
+	user: process.env.DB_USER,
+	pass: process.env.DB_PASSWORD
 }
 options.server.socketOptions = options.replset.socketOptions = { keepAlive: 1 };
 
-mongoose.connect(uri, options);
+mongoose.connect(process.env.MONGOLAB_URI, options);
+
+console.log(JSON.stringify(options) + "\n" + process.env.DB_USER + "\n" + process.env.DB_PASSWORD);
 
 var con = module.exports.connection = mongoose.connection;
-
 var userModel = mongoose.model('userM',user.userSchema);
 
 con.once('open',function(err){
@@ -23,11 +25,7 @@ con.once('open',function(err){
 	if(err!=null){
 		console.log(err);
 	}else{
-		if(uri == process.env.MONGOLAB_URI) {
-			console.log('Successfully opened production db connection');
-		} else {
-			console.log('Successfully opened db connection to dev: ' + uri + " \noptions: \n" + JSON.stringify(options, null, 4));
-		}
+		console.log('Successfully opened production db connection');
 	}
 
 });

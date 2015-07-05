@@ -7,7 +7,7 @@ exports.missingParameter = function(action) {
 
 // SessionConotrller.js errors
 exports.sessionFailed = function(user) {
-	var m = "Session authentication failed";
+	var m = "Session not created or expired";
 	console.log(m + " on user " + user);
 	return {result: -10, data: m};
 } 

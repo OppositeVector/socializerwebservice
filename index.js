@@ -1,138 +1,164 @@
 var express = require('express');
 var url = require('url');
 var dbController = require("./DBController");
-var service = express();
-var actions = require("./Actions")(service, dbController);
+var app = express();
+var service = require("./ServiceController")(app, dbController);
 var errors = require("./Errors");
 
 var port = process.env.PORT || 3000;
 
-service.get('/register',function (req,res) {
+function NonSessioned() {
 
-	var urlPart = url.parse(req.url,true);
-	var query = urlPart.query;
-	if((query.key != null) && (query.pn != null)) {
-		actions.Register(query.key, query.pn, res);
-		return;
-	}
+	console.log("non sessioned");
 
-	actions.SendJson(errors.missingParameter("register"), res);
+	app.get('/register',function (req,res) {
 
-});
-
-service.post('/register',function (req,res) {
-
-	if((req.body.key != null) && (req.body.pn)) {
-		actions.Register(req.body.key, req.body.pn, res);
-		return;
-	}
-
-	actions.SendJson(errors.missingParameter("register"), res);
-
-
-});
-
-// Located here because i want the registration paths to come before the session check, skipping it
-var sessionController = require("./SessionController")(service, dbController, actions);
-
-service.get('/login',function (req,res) {
-
-	if(req.session.user != null) {
-		actions.SendJson({result: 1, data:"Session created"}, res);
-		console.log("Session created for user " + req.session.user.phoneNumber);
-	}
-
-});
-
-service.post('/login',function (req,res) {
-
-	if(req.session.user != null) {
-		actions.SendJson({result: 1, data:"Session created"}, res);
-		console.log("Session created for user " + req.session.user.phoneNumber);
-	}
-	
-});
-
-service.get("/createGroup", function (req, res) {
-
-	var urlPart = url.parse(req.url,true);
-	var query = urlPart.query;
-
-	if(query != null) {
-		if(query.group != null) {
-			actions.CreateGroup(req.session.user, query.group, res);
+		var urlPart = url.parse(req.url,true);
+		var query = urlPart.query;
+		if((query.key != null) && (query.pn != null)) {
+			service.Register(query.pn, query.key, res);
 			return;
 		}
-	}
 
-	actions.SendJson(errors.missingParameter("createGroup"), res);
+		service.SendJson(errors.missingParameter("register"), res);
 
-});
+	});
 
-service.post("/createGroup", function (req,res) {
-	
-	if(req.body != null) {
-		if(req.body.group != null) {
-			actions.CreateGroup(req.session.user, req.body.group, res);
+	app.post('/register',function (req,res) {
+
+		if((req.body.key != null) && (req.body.pn)) {
+			service.Register(req.body.pn, req.body.key, res);
 			return;
 		}
-	}
 
-	actions.SendJson(errors.missingParameter("createGroup"), res);
-	
-});
+		service.SendJson(errors.missingParameter("register"), res);
 
-service.post("/removeGroup", function (req, res) {
 
-	if(req.body != null) {
-		if(req.body.groupName != null) {
-			actions.RemoveGroup(req.session.user, req.body.groupName, res);
-			return;
+	});
+
+}
+
+function Sessioned() {
+
+	console.log("sessioned");
+
+	app.get('/login',function (req,res) {
+
+		var urlPart = url.parse(req.url,true);
+		var query = urlPart.query;
+		if((query.pn != null) && (query.key != null)) {
+			service.Login(query.pn, query.key, req, res);
+		}else {
+			service.SendJson(errors.missingParameter("login"), res);
 		}
-	}
 
-	actions.SendJson(errors.missingParameter("removeGroup"), res);
-	
-});
+	});
 
-service.post("/updateGroup", function (req, res) {
+	app.post('/login',function (req,res) {
 
-	if(req.body != null) {
-		if(req.body.group != null) {
-			actions.UpdateGroup(req.session.user, req.body.group, res);
-			return;
+		if(req.body != null) {
+			if((req.body.pn != null) && (req.body.key != null)) {
+				service.Login(req.body.pn, req.body.key, req, res);
+				return;
+			}
 		}
-	}
+		
+		service.SendJson(errors.missingParameter("login"), res);
 
-	actions.SendJson(errors.missingParameter("updateGroup"), res);
-	
-});
+	});
 
-service.get("/retriveAll", function (req, res) {
-	var retVal = req.session.user.groups;
-	actions.SendJson(retVal, res);
-});
+}
 
-service.get("/retrieveGroup", function (req, res) {
+function AuthenticatedSession() {
 
-	if(req.body != null) {
-		if(req.body.groupName != null) {
-			actions.RetrieveGroup(req.session.user, req.body.groupName, res);
-			return;
+	console.log("authenticated");
+
+	app.get("/createGroup", function (req, res) {
+
+		var urlPart = url.parse(req.url,true);
+		var query = urlPart.query;
+
+		if(query != null) {
+			if(query.group != null) {
+				service.CreateGroup(req.session.user, query.group, res);
+				return;
+			}
 		}
-	}
 
-	actions.SendJson(errors.missingParameter("retrieveGroup"), res);
+		service.SendJson(errors.missingParameter("createGroup"), res);
 
-});
+	});
 
-service.get("/tester", function(req, res) {
+	app.post("/createGroup", function (req,res) {
+		
+		if(req.body != null) {
+			if(req.body.group != null) {
+				service.CreateGroup(req.session.user, req.body.group, res);
+				return;
+			}
+		}
 
-	actions.SendJson({timesViewed: req.session.counter}, res);
-	console.log(req.session.counter);
+		service.SendJson(errors.missingParameter("createGroup"), res);
+		
+	});
 
-});
+	app.post("/removeGroup", function (req, res) {
 
-service.listen(port, function() {
+		if(req.body != null) {
+			if(req.body.groupName != null) {
+				service.RemoveGroup(req.session.user, req.body.groupName, res);
+				return;
+			}
+		}
+
+		service.SendJson(errors.missingParameter("removeGroup"), res);
+		
+	});
+
+	app.post("/updateGroup", function (req, res) {
+
+		if(req.body != null) {
+			if(req.body.group != null) {
+				service.UpdateGroup(req.session.user, req.body.group, res);
+				return;
+			}
+		}
+
+		service.SendJson(errors.missingParameter("updateGroup"), res);
+		
+	});
+
+	app.get("/retriveAll", function (req, res) {
+		var retVal = req.session.user.groups;
+		service.SendJson(retVal, res);
+	});
+
+	app.get("/retrieveGroup", function (req, res) {
+
+		if(req.body != null) {
+			if(req.body.groupName != null) {
+				service.RetrieveGroup(req.session.user, req.body.groupName, res);
+				return;
+			}
+		}
+
+		service.SendJson(errors.missingParameter("retrieveGroup"), res);
+
+	});
+
+	app.get("/tester", function(req, res) {
+
+		service.SendJson({timesViewed: req.session.counter}, res);
+		console.log(req.session.counter);
+
+	});
+
+}
+
+// Located here because i want the registration and login paths to come before the session check, skipping it
+var sessionController = require("./SessionController")(app, dbController, service, NonSessioned, Sessioned, AuthenticatedSession);
+
+
+app.listen(port, function() {
     console.log('App ready on port: ' + port);
 });
