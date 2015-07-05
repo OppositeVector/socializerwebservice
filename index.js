@@ -42,7 +42,7 @@ function Sessioned() {
 
 	console.log("sessioned");
 
-	app.get('/login',function (req,res) {
+	app.get('/login', function (req,res) {
 
 		var urlPart = url.parse(req.url,true);
 		var query = urlPart.query;
@@ -54,9 +54,11 @@ function Sessioned() {
 
 	});
 
-	app.post('/login',function (req,res) {
+	app.post('/login', function (req,res) {
 
 		console.log(JSON.stringify(req.body));
+		console.log(req.url);
+		console.log(JSON.stringify(req.headers));
 
 		if(req.body != null) {
 			if((req.body.pn != null) && (req.body.key != null)) {
