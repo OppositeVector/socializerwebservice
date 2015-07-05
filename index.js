@@ -4,8 +4,11 @@ var dbController = require("./DBController");
 var app = express();
 var service = require("./ServiceController")(app, dbController);
 var errors = require("./Errors");
+var bodyParser = require("body-parser");
 
 var port = process.env.PORT || 3000;
+
+app.use(bodyParser);
 
 function NonSessioned() {
 
