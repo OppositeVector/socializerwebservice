@@ -60,10 +60,6 @@ function Sessioned() {
 
 	app.post('/login', function (req,res) {
 
-		console.log(JSON.stringify(req.body));
-		console.log(req.url);
-		console.log(JSON.stringify(req.headers));
-
 		if(req.body != null) {
 			if((req.body.pn != null) && (req.body.key != null)) {
 				service.Login(req.body.pn, req.body.key, req, res);
