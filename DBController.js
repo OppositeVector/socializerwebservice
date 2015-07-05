@@ -15,8 +15,6 @@ options.server.socketOptions = options.replset.socketOptions = { keepAlive: 1 };
 
 mongoose.connect(process.env.MONGOLAB_URI, options);
 
-console.log(JSON.stringify(options) + "\n" + process.env.DB_USER + "\n" + process.env.DB_PASSWORD);
-
 var con = module.exports.connection = mongoose.connection;
 var userModel = mongoose.model('userM',user.userSchema);
 
