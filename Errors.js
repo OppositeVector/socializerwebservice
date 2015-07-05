@@ -8,7 +8,7 @@ exports.missingParameter = function(action) {
 // SessionConotrller.js errors
 exports.sessionFailed = function(user) {
 	var m = "Session not created or expired";
-	console.log(m + " on user " + user);
+	console.log(m);
 	return {result: -10, data: m};
 } 
 
@@ -39,7 +39,7 @@ exports.userUpdate = function(err) {
 	return {result: -25, data: m};
 }
 
-// Actions.js errors
+// ServiceController.js errors
 exports.groupExists = function() {
 	var m = "Group already exists";
 	console.log(m);

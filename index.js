@@ -132,12 +132,12 @@ function AuthenticatedSession() {
 		
 	});
 
-	app.get("/retriveAll", function (req, res) {
+	app.post("/retriveAll", function (req, res) {
 		var retVal = req.session.user.groups;
 		service.SendJson(retVal, res);
 	});
 
-	app.get("/retrieveGroup", function (req, res) {
+	app.post("/retrieveGroup", function (req, res) {
 
 		if(req.body != null) {
 			if(req.body.groupName != null) {
