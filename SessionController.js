@@ -19,6 +19,17 @@ function controller(express, mongoose, act, nonSessioned, sessioned, authenticat
 	dbController = mongoose;
 	actions = act;
 
+	app.use(function(req, res, next) {
+		if(req != null) {
+			if(req.headers != null) {
+				console.log(JSON.stringify(req.headers));
+			}
+			if(req.body != null) {
+				console.log(JSON.stringify(req.body));
+			}
+		}
+	});
+
 	nonSessioned();
 
 	console.log("basic session");
