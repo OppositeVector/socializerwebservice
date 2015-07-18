@@ -28,6 +28,7 @@ function controller(express, mongoose, act, nonSessioned, sessioned, authenticat
 				console.log(JSON.stringify(req.body));
 			}
 		}
+		next();
 	});
 
 	nonSessioned();
