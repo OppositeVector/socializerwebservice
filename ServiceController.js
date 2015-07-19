@@ -55,7 +55,7 @@ module.exports = function(express, mongoose) {
 				} else {
 					if(userData.key==key){
 						req.session.user = userData;
-						console.log("Authentication successfull on user: " + userData);
+						console.log("Authentication successfull on user: \n" + userData);
 						SendJson({result: 1, data: "Authentication successfull"}, res);
 					}else{
 						SendJson(errors.sessionFailed(req.session.user.phoneNumber), res);

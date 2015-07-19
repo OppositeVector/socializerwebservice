@@ -133,23 +133,28 @@ exports.GetUser = function(username, callback) {
 
 }
 
-exports.UpdateUser = function(user, callback) {
+exports.UpdateUser = function(userObj, callback) {
 
-	user.save(function(err, doc) {
+	QueryUserAndExecute(userObj.phoneNumber, function(user) {
 
-		if(err != null) {
+		user.groups = userObj.groups;
+		user.save(function(err, doc) {
 
-			console.log(errors.userUpdate(err));
-			if(callback != null) {
-				callback(errors.userUpdate(err));
+			if(err != null) {
+
+				console.log(errors.userUpdate(err));
+				if(callback != null) {
+					callback(errors.userUpdate(err));
+				}
+
+			} else {
+				if(callback != null) {
+					callback(user);
+				}
 			}
 
-		} else {
-			if(callback != null) {
-				callback(user);
-			}
-		}
-
+		});
 	});
+	
 
 }
