@@ -149,7 +149,7 @@ function AuthenticatedSession() {
 
 	app.post("/retrieveAll", function (req, res) {
 		var retVal = req.session.user.groups;
-		service.SendJson(retVal, res);
+		service.SendJson({result: 1, data: retVal}, res);
 	});
 
 	app.post("/retrieveGroup", function (req, res) {
