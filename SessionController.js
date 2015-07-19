@@ -20,6 +20,12 @@ function controller(express, mongoose, act, nonSessioned, sessioned, authenticat
 	actions = act;
 
 	app.use(function(req, res, next) {
+	  	res.header("Access-Control-Allow-Origin", "*");
+	 	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+	 	next();
+	});
+
+	app.use(function(req, res, next) {
 		if(req != null) {
 			if(req.headers != null) {
 				console.log(JSON.stringify(req.headers));
