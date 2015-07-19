@@ -71,7 +71,8 @@ module.exports = function(express, mongoose) {
 			if(gIndex != null) {
 				SendJson(errors.groupExists(), res);
 			} else {
-				user.group.push(group);
+				console.log(JSON.stringify(user));
+				user.groups.push(group);
 				dbController.UpdateUser(user, function(userData) {
 					if(userData.result == null) {
 						SendJson({result:1, data: "Group added"}, res);

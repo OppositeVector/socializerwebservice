@@ -22,10 +22,10 @@ function controller(express, mongoose, act, nonSessioned, sessioned, authenticat
 	app.use(function(req, res, next) {
 		if(req != null) {
 			if(req.headers != null) {
-				console.log(JSON.stringify(req.headers));
+				console.log("Headers check:\n" + JSON.stringify(req.headers));
 			}
 			if(req.body != null) {
-				console.log(JSON.stringify(req.body));
+				console.log("Body check:\n" + JSON.stringify(req.body));
 			}
 		}
 		next();
@@ -45,9 +45,9 @@ function controller(express, mongoose, act, nonSessioned, sessioned, authenticat
 	app.use(function(req, res, next) {
 		if(req.session != null) {
 			if(req.session.user != null) {
-				console.log(JSON.stringify(req.session.user));
+				console.log("User check:\n" + JSON.stringify(req.session.user));
 			} else {
-				console.log("no user on the session");
+				console.log("User check: no user on the session");
 			}
 		}
 		next();
