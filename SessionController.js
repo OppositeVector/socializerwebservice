@@ -27,6 +27,13 @@ function controller(express, mongoose, act, nonSessioned, sessioned, authenticat
 			if(req.body != null) {
 				console.log(JSON.stringify(req.body));
 			}
+			if(req.session != null) {
+				if(req.session.user != null) {
+					console.log(JSON.stringify(req.session.user));
+				} else {
+					console.log("no user on the session");
+				}
+			}
 		}
 		next();
 	});
