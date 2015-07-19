@@ -6,11 +6,12 @@ var service = require("./ServiceController")(app, dbController);
 var errors = require("./Errors");
 var bodyParser = require("body-parser");
 
+
 var port = process.env.PORT || 3000;
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cors())
+// app.use(cors())
 
 function NonSessioned() {
 
