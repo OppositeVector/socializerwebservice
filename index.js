@@ -10,7 +10,7 @@ var bodyParser = require("body-parser");
 var port = process.env.PORT || 3000;
 
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: true }));
 // app.use(cors())
 
 function NonSessioned() {
@@ -109,7 +109,7 @@ function AuthenticatedSession() {
 
 	app.post("/createGroup", function (req,res) {
 		
-		console.log(JSON.parse(req.body));
+		console.log(req.body);
 		if(req.body != null) {
 			if(req.body.group != null) {
 				service.CreateGroup(req.session.user, req.body.group, res);
