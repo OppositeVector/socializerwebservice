@@ -45,6 +45,7 @@ function NonSessioned() {
 		res.header("Access-Control-Allow-Methods", "POST");
 		res.header("Access-Control-Allow-Headers", "Content-Type");
 		console.log(JSON.stringify(res.headers));
+		res.status(200);
 		res.send();
 	});
 
