@@ -43,7 +43,7 @@ function NonSessioned() {
 	});
 
 	app.options("/*", function (req, res) {
-		res.header("Access-Control-Allow-Origin", req.url);
+		res.header("Access-Control-Allow-Origin", req.get('origin'));
 		res.header("Access-Control-Allow-Methods", "POST");
 		res.header("Access-Control-Allow-Headers", "Content-Type");
 		console.log(JSON.stringify(res.headers));
