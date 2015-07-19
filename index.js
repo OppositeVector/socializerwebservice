@@ -40,6 +40,14 @@ function NonSessioned() {
 
 	});
 
+	app.options("/*", function (req, res) {
+		res.header("Access-Control-Allow-Origin", "*");
+		res.header("Access-Control-Allow-Methods", "POST");
+		res.header("Access-Control-Allow-Headers", "Content-Type");
+		console.log(JSON.stringify(res.headers));
+		res.send();
+	});
+
 }
 
 function Sessioned() {
@@ -135,7 +143,7 @@ function AuthenticatedSession() {
 		
 	});
 
-	app.post("/retriveAll", function (req, res) {
+	app.post("/retrieveAll", function (req, res) {
 		var retVal = req.session.user.groups;
 		service.SendJson(retVal, res);
 	});
