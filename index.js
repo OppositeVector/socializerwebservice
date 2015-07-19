@@ -109,7 +109,7 @@ function AuthenticatedSession() {
 
 	app.post("/createGroup", function (req,res) {
 		
-		console.log(req.body);
+		console.log(req.body + "\n" + req.session.user);
 		if(req.body != null) {
 			if(req.body.group != null) {
 				service.CreateGroup(req.session.user, req.body.group, res);
