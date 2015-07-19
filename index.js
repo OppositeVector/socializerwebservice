@@ -5,11 +5,13 @@ var app = express();
 var service = require("./ServiceController")(app, dbController);
 var errors = require("./Errors");
 var bodyParser = require("body-parser");
+var cors = require('cors')
 
 var port = process.env.PORT || 3000;
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(cors());
 
 function NonSessioned() {
 
@@ -38,15 +40,6 @@ function NonSessioned() {
 		service.SendJson(errors.missingParameter("register"), res);
 
 
-	});
-
-	app.options("/*", function (req, res) {
-		//res.header("Access-Control-Allow-Origin", "*");
-		//res.header("Access-Control-Allow-Methods", "POST");
-		//res.header("Access-Control-Allow-Headers", "Content-Type");
-		console.log(JSON.stringify(res.headers));
-		res.status(200);
-		res.send();
 	});
 
 }
