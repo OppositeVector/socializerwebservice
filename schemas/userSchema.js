@@ -30,7 +30,8 @@ var user = new schemaBase({
 			whatsapp:Number,
 			sms:Number
 		},
-		lastReset:Date
+		lastReset:Date,
+		reminder:Boolean
 	}]
 },{collection: "users"});
 
