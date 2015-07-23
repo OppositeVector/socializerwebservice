@@ -7,8 +7,9 @@ var user = new schemaBase({
 	groups: [{
 		name:String,
 		contacts:[{
-			name:String,
-			phoneNumber:String,
+			id:String,
+			displayName:String,
+			phoneNumber:[String],
 			communications:{
 				calls:{
 					count:Number,
@@ -31,7 +32,8 @@ var user = new schemaBase({
 			sms:Number
 		},
 		lastReset:Date,
-		reminder:Boolean
+		reminder:Boolean,
+		missedCallSnoozer:Boolean
 	}]
 },{collection: "users"});
 
