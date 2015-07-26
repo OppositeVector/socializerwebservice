@@ -1,6 +1,6 @@
 var mongoose = require('mongoose');
 var user = require('./schemas/userSchema');
-var errors = require("./Error");
+var errors = require("./Errors");
 
 var dotenv = require("dotenv")
 dotenv.config({silent: true})
