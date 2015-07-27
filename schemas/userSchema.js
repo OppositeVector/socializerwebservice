@@ -9,7 +9,7 @@ var user = new schemaBase({
 		contacts:[{
 			id:String,
 			displayName:String,
-			phoneNumber:[String],
+			phoneNumbers:[String],
 			communications:{
 				calls:{
 					count:Number,
